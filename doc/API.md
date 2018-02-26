@@ -1,5 +1,8 @@
 # 推送消息 
-POST /msg  
+POST /msg?topci=xxx  
+{
+    "data": "xxx
+}
 将消息推送到消息系统，系统保存消息及其相关信息
 
 返回消息ID（uuid, 消息体中）

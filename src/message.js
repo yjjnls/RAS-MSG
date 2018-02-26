@@ -5,11 +5,11 @@ const EventEmitter = require('events').EventEmitter;
 const msg_state = ['prepared', 'published', 'consumed'];
 
 class msg extends EventEmitter {
-    construct(data, addr) {
+    construct(data, topic) {
         // msg data
         this.data_ = data;
-        // consumer addr
-        this.consumer_addr_ = addr;
+        // msg topic
+        this.topic_ = topic;
         // msg state
         this.state_ = msg_state[0];
         // msg state timeout
