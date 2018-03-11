@@ -1,0 +1,34 @@
+{
+  "name": "ras-msg",
+  "version": "1.0.0",
+  "description": "Reliable asynchronous message system ensuring eventually consistency for distributed system.",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc",
+    "example": "examples",
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yjjnls/RAS-MSG.git"
+  },
+  "keywords": [
+    "asynchronous",
+    "message-queue"
+  ],
+  "author": "NalanShao",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/yjjnls/RAS-MSG/issues"
+  },
+  "homepage": "https://github.com/yjjnls/RAS-MSG#readme",
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "colors": "latest",
+    "request": "latest",
+    "uuid": "latest"
+  }
+}
