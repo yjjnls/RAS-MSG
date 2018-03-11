@@ -1,5 +1,5 @@
 # 推送消息 
-POST /msg?topci=xxx  
+POST /msg?topic=xxx  
 {
     "data": "xxx
 }
