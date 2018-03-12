@@ -6,6 +6,10 @@ POST /msg?topic=xxx
 将消息推送到消息系统，系统保存消息及其相关信息
 
 返回消息ID（uuid, 消息体中）
+200 OK
+{
+    "uuid": "......"
+}
 
 # 发布消息
 PUT  /msg?id=xxx
