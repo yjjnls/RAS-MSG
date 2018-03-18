@@ -29,6 +29,7 @@
     "bluebird": "^3.5.1",
     "colors": "latest",
     "request": "latest",
-    "uuid": "latest"
+    "uuid": "latest",
+    "redis": "latest"
   }
 }

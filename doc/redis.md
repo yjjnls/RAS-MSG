@@ -1,6 +1,6 @@
 1.  所有msg（包括相关信息）如何存储
-    考虑存入hash， msg:uuid  
-    hash中各个key-val就是msg的各个属性  
+考虑存入zset， msg_data  
+成员为包含msg各个属性的json，分值为uuid 
 
 存入一个hash， key为uuid value为其他属性的json字符串
 
@@ -13,7 +13,7 @@ push模式需要订阅端一直在线，断线可能会导致订阅端消息丢�
 
 ## 创建 MQ
 
--   ras会对每一个接收到的msg分配一个msg_id，msg_id为基于时间戳产生的uuid（递增）。
+-   RAS会对每一个接收到的msg分配一个msg_id，msg_id为基于时间戳产生的uuid（递增）。
 -   每个topic对应redis中一个群组，用zset来存储。
     zset名称为topic:xxx，zset成员为消息，zset分值为msg_id。
     ```
@@ -51,7 +51,7 @@ push模式需要订阅端一直在线，断线可能会导致订阅端消息丢�
 <!-- -   获取topic:xxx的分布式锁 -->
 -   对每一个topic，zrangebyscore获取在topic:xxx中获取所有未读消息。
 -   每一条msg处理完成之后，1. 更新sub:xxx和service:xxx中的最大读取消息id为msg_id。
--   2. 向ras发送消息，通知msg_id已经被该服务消费。
+-   2. 向RAS发送消息，通知msg_id已经被该服务消费。
 <!-- -   释放分布式锁 -->
 
 ## RAS更新
@@ -59,6 +59,6 @@ push模式需要订阅端一直在线，断线可能会导致订阅端消息丢�
 * 如果不存在，说明该消息被所有订阅者消费，在topic:xxx和data中删除该消息
 * 如果存在，说明还有订阅者未消费完成该消息，不作处理。
 
-4.  是否要加锁？如果只有ras操作redis，那么不需要加锁，如果是downstream拉取消息后也要delete消息，那么就是两个线程会操作redis，得加锁
-redis的使用分为两个部分，第一个部分是用于持久化ras中收到的消息，这个部分只有ras进行操作，不需要加锁。    
-第二个部分是利用redis作为一个MQ，这里考虑采取pull模式，其中ras与下游应用均会对不同存储内容进行操作，但操作并没有数据上的相互依赖，所以不需要加锁。
+4.  是否要加锁？如果只有RAS操作redis，那么不需要加锁，如果是downstream拉取消息后也要delete消息，那么就是两个线程会操作redis，得加锁
+redis的使用分为两个部分，第一个部分是用于持久化RAS中收到的消息，这个部分只有RAS进行操作，不需要加锁。    
+第二个部分是利用redis作为一个MQ，这里考虑采取pull模式，其中RAS与下游应用均会对不同存储内容进行操作，但操作并没有数据上的相互依赖，所以不需要加锁。
