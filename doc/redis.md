@@ -41,15 +41,24 @@ push模式需要订阅端一直在线，断线可能会导致订阅端消息丢�
 
 ## 推送消息到 MQ
 
--   获取topic:xxx的分布式锁
+<!-- -   获取topic:xxx的分布式锁 -->
 -   将消息添加到topic:xxx
--   释放分布式锁
+<!-- -   释放分布式锁 -->
 
 ## 从 MQ 获取消息
 
--   zrange遍历service:xxx，获取订阅的topic，和每个topic中收到的最新消息。
--   
+-   zrange遍历service:xxx，获取订阅的所有topic，和每个topic中收到的最新消息。
+<!-- -   获取topic:xxx的分布式锁 -->
+-   对每一个topic，zrangebyscore获取在topic:xxx中获取所有未读消息。
+-   每一条msg处理完成之后，1. 更新sub:xxx和service:xxx中的最大读取消息id为msg_id。
+-   2. 向ras发送消息，通知msg_id已经被该服务消费。
+<!-- -   释放分布式锁 -->
+
+## RAS更新
+* RAS收到消费成功消息后，向sub:xxx查询该msg_id是否存在
+* 如果不存在，说明该消息被所有订阅者消费，在topic:xxx和data中删除该消息
+* 如果存在，说明还有订阅者未消费完成该消息，不作处理。
 
 4.  是否要加锁？如果只有ras操作redis，那么不需要加锁，如果是downstream拉取消息后也要delete消息，那么就是两个线程会操作redis，得加锁
 redis的使用分为两个部分，第一个部分是用于持久化ras中收到的消息，这个部分只有ras进行操作，不需要加锁。    
-第二个部分是利用redis作为一个MQ，这里考虑采取pull模式，订阅端需要读取数据，而推送端又要发布数据，这里需要加锁。
+第二个部分是利用redis作为一个MQ，这里考虑采取pull模式，其中ras与下游应用均会对不同存储内容进行操作，但操作并没有数据上的相互依赖，所以不需要加锁。
