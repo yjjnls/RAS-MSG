@@ -20,7 +20,7 @@ PUT  /msg?id=xxx
 **回复200 OK只能表示RAS收到了http消息，并不能表示后续逻辑正确执行。**
 
 # 消费消息
-DELETE /msg?id=xxx&topic=xxx
+DELETE /msg?id=xxx
 消费者完成本地事务，告诉消息系统，消息已经消费完成。
 **回复200 OK只能表示RAS收到了http消息，并不能表示后续逻辑正确执行。**
 
