@@ -16,18 +16,21 @@ push模式需要订阅端一直在线，断线可能会导致订阅端消息丢�
 -   RAS会对每一个接收到的msg分配一个msg_id，msg_id为基于时间戳产生的uuid（递增）。
 -   每个topic对应redis中一个群组，用zset来存储。
     zset名称为topic:xxx，zset成员为消息，zset分值为msg_id。
+
         ╭──── topic:xxx ─────┬─────── zset ───────╮
         │￣￣￣￣￣￣￣￣￣￣￣┆￣￣￣￣￣￣￣￣￣￣￣│
         │     msg_data       ┆       msg_id       │
         ╰────────────────────┴────────────────────╯
 -   所有订阅该topic的服务会由一个zset来记录。
     zset名称为sub:topicxxx，成员为订阅该主题的服务名称，分值为订阅服务收到的最大msg_id（初始化为0）。
+
         ╭───── sub:xxx ──────┬─────── zset ───────╮
         │￣￣￣￣￣￣￣￣￣￣￣┆￣￣￣￣￣￣￣￣￣￣￣│
         │   service_name     ┆     max_msg_id     │
         ╰────────────────────┴────────────────────╯
 -   每个服务订阅了哪些topic又一个zset来记录。
     zset名称为service:xxx，成员为topic，分值为该topic中获取的最大msg_id。
+    
         ╭─── service:xxx ────┬─────── zset ───────╮
         │￣￣￣￣￣￣￣￣￣￣￣┆￣￣￣￣￣￣￣￣￣￣￣│
         │     topic_name     ┆     max_msg_id     │
