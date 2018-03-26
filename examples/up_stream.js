@@ -95,7 +95,6 @@ function OnMessage(data, req, res) {
     send(res, 400, 'API Not found!');
 }
 
-let msgs = [];//already done msg/**ras */
 let ras_url = 'http://127.0.0.1:8000/msg';
 let local_url = 'http://127.0.0.1:8001/zhifubao';
 
