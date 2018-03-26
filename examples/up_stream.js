@@ -4,8 +4,7 @@ const colors = require('colors');
 const http = require('http');
 const url = require('url');
 let request = require('../lib/request.js');
-var redis = require("redis"),
-    client = redis.createClient();
+var mq = require('../lib/mq.js');
 
 
 const CRLF = '\r\n';
@@ -85,10 +84,10 @@ function OnMessage(data, req, res) {
         switch (req.method) {
             case 'POST':
                 add_transcation(res, dataObj);
-                break;
+                return;
             case 'GET':
                 query(res, uri.query.id);
-                break;
+                return;
         }
     }
     error('API Not found!');
@@ -108,14 +107,7 @@ async function add_transcation(res, data) {
         console.log('do local transcation');
         step++;
         //store msg id( optimized: store in redis )
-        await client.saddAsync(`msgs:${service_name}`, msg_id)
-            .then(res => {
-                console.log(`local transcation[${msg_id}] has been done in ${service_name} service!`);
-            })
-            .error(err => {
-                console.log(err.message);
-                throw new Error(err.message);
-            })/**ras */
+        await mq.add_into_set(service_name, msg_id);/**ras */
         step++;
         await request.Put(`${ras_url}?id=${msg_id}`);/**ras */
     }
@@ -128,7 +120,8 @@ async function add_transcation(res, data) {
                 break;
             case 2:
                 {
-                    msgs.push(msg_id);
+                    console.log('~~~~~~~~~~~~~~~~')
+                    console.log(err.message)
                     break;
                 }
         }
@@ -137,15 +130,14 @@ async function add_transcation(res, data) {
 }
 
 async function query(res, msg_id) {/**ras */
-    await client.sismember(`msgs:${service_name}`, msg_id)
-        .then(res => {
-            if (res == 1)
-                send(res, 200, JSON.stringify({ "msg": "done" }));
-            else
-                send(res, 200, JSON.stringify({ "msg": "undo" }));
-        })
-        .error(err => {
-            console.log(err.message);
-            throw new Error(err.message);
-        })/**ras */
+    console.log('query');
+    try {
+        let is_in = await mq.query_from_set(service_name, msg_id);
+        if (is_in == 1)
+            send(res, 200, JSON.stringify({ "msg": "done" }));
+        else
+            send(res, 200, JSON.stringify({ "msg": "undo" }));
+    } catch (err) {
+        console.log(err.message);
+    }    /**ras */
 }

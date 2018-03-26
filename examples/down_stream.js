@@ -101,7 +101,7 @@ async function subscribe(topic) {
 
 async function consume_msg() {
     let res = await mq.fetch_msg(service_name);
-    console.log('=====>fetch msg over<=====');
+    console.log(`=====>fetch msg ${res.length} over<=====` + new Date());
     for (var i = 0; i < res.length; i = i + 2) {
         let msg_id = res[i + 1];
         try {
@@ -112,9 +112,9 @@ async function consume_msg() {
             console.log(`[msg topic] ${topic}\n[msg id] ${msg_id} \n[msg data] ${data} \nDo Something!`);
             console.log('-------------------');
 
-            await update_recved_msg_id(service_name, topic, msg_id);
+            await mq.update_recved_msg_id(service_name, topic, msg_id);
             // notify ras
-            await request.Delete(`http://127.0.0.1:8000/msg?${msg_id}`);
+            await request.Delete(`http://127.0.0.1:8000/msg?id=${msg_id}`);
         } catch (err) {
             console.log(err.message);
             throw new Error(err.message);
