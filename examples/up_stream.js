@@ -4,6 +4,8 @@ const colors = require('colors');
 const http = require('http');
 const url = require('url');
 let request = require('../lib/request.js');
+var redis = require("redis"),
+    client = redis.createClient();
 
 
 const CRLF = '\r\n';
@@ -47,7 +49,7 @@ http.createServer((req, res) => {
     })
 }).listen(8001);
 
-
+let service_name = 'zhifubao';
 function OnMessage(data, req, res) {
     if (req.headers) {
         trace(JSON.stringify(req.headers));
@@ -79,7 +81,7 @@ function OnMessage(data, req, res) {
     }
 
     let uri = url.parse(req.url, true);
-    if (uri.pathname == '/zhifubao') {
+    if (uri.pathname == `/${service_name}`) {
         switch (req.method) {
             case 'POST':
                 add_transcation(res, dataObj);
@@ -107,7 +109,14 @@ async function add_transcation(res, data) {
         console.log('do local transcation');
         step++;
         //store msg id( optimized: store in redis )
-        msgs.push(msg_id);/**ras */
+        await client.saddAsync(`msgs:${service_name}`, msg_id)
+            .then(res => {
+                console.log(`local transcation[${msg_id}] has been done in ${service_name} service!`);
+            })
+            .error(err => {
+                console.log(err.message);
+                throw new Error(err.message);
+            })/**ras */
         step++;
         await request.Put(`${ras_url}?id=${msg_id}`);/**ras */
     }
@@ -129,9 +138,15 @@ async function add_transcation(res, data) {
 }
 
 async function query(res, msg_id) {/**ras */
-    if (msgs.indexOf(msg_id) == -1) {
-        send(res, 200, JSON.stringify({ "msg": "undo" }));
-    } else {
-        send(res, 200, JSON.stringify({ "msg": "done" }));
-    }
+    await client.sismember(`msgs:${service_name}`, msg_id)
+        .then(res => {
+            if (res == 1)
+                send(res, 200, JSON.stringify({ "msg": "done" }));
+            else
+                send(res, 200, JSON.stringify({ "msg": "undo" }));
+        })
+        .error(err => {
+            console.log(err.message);
+            throw new Error(err.message);
+        })/**ras */
 }
