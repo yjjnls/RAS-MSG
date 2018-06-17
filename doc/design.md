@@ -75,4 +75,6 @@ RAS的状态需要和下游应用的业务执行保持一致，RAS状态不是�
 
 除了上述流程之外，RAS和上下游应用都应该能够在发生错误重启后向redis访问恢复之前的数据。
 
-## 
+## 在区块链中的应用
+
+[传统银行IT如何落地区块链技术？-- 解决事务一致性](http://www.infoq.com/cn/articles/how-to-land-blockchain-in-traditional-bank?utm_source=articles_about_qukuailian&utm_medium=link&utm_campaign=qukuailian)
