@@ -19,7 +19,7 @@
 -   可靠消息服务（下称RAS）和 MQ 消息组件，协调上下游消息的传递，并确保上下游数据的一致性。
 -   下游应用，监听 MQ 的消息并执行自身业务。
 
-![](https://github.com/yjjnls/RAS-MSG/blob/master/img/design1.png)
+![](https://github.com/yjjnls/RAS-MSG/blob/master/img/design1.jpg)
 
 ### 上游应用执行业务并发送 MQ 消息（第一阶段）
 
@@ -31,7 +31,7 @@
 5.  RAS修改消息状态为`发送状态（已发送）`并**将消息投递到 MQ 中间件**。
 
 
-![](https://github.com/yjjnls/RAS-MSG/blob/master/img/design2.png)
+![](https://github.com/yjjnls/RAS-MSG/blob/master/img/design2.jpg)
 
 
 | 出错步骤 | 原因                                                | 影响                                                                              |
@@ -63,7 +63,7 @@ RAS的状态需要和下游应用的业务执行保持一致，RAS状态不是�
 5.  RAS查询该消息是否已经被所有订阅者消费完成，如果已完成，就更新`消息持久化存储部分`和`MQ`（将已经消费的消息删除），RAS将该消息状态更改为`已完成`。
 
 
-![](https://github.com/yjjnls/RAS-MSG/blob/master/img/design3.png)
+![](https://github.com/yjjnls/RAS-MSG/blob/master/img/design3.jpg)
 
 这里理论上不应该直接对MQ进行操作，因为RAS是处理者且内部包含了MQ，但这里为了简化实现方式才这样处理，后续版本会改进。
 
